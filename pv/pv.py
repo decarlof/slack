@@ -18,7 +18,7 @@ def onChanges(pvname=None, value=None, char_value=None, **kw):
     client = WebClient(token=bot_token)
 
     # ID of channel you want to post message to
-    channel_id = "auto_2bm"
+    channel_id = "automated"
     message = pvname + ': ' + char_value
 
     try:
