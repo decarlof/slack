@@ -21,7 +21,8 @@ SECTIONS['general'] = {
     'verbose': {
         'default': True,
         'help': 'Verbose output',
-        'action': 'store_true'}}
+        'action': 'store_true'}
+        }
 
 SECTIONS['PV'] = {
     'pv-list': {
@@ -33,10 +34,34 @@ SECTIONS['PV'] = {
         'default': 5,
         'help': "PVs log time in seconds"},
         }
-        
-PV_PARAMS = ('PV', )
 
-NICE_NAMES = ('General', 'PV List')
+SECTIONS['ramp'] = {
+    'ramp-control-pv': {
+        'default': '2bmb:ET1:Setpoint.VAL',
+        'type': str,
+        'help': "PV to ramp its value"},
+    'ramp-read-pv': {
+        'default': '2bmb:ET1:RBV_pvTemp',
+        'type': str,
+        'help': "PV to ramp its value"},
+    'ramp-start': {
+        'type': float,
+        'default': 25,
+        'help': "ramp start value"},
+    'ramp-end': {
+        'type': float,
+        'default': 30,
+        'help': "ramp end value"},
+    'ramp-rate': {
+        'type': float,
+        'default': 1,
+        'help': "ramp rate in unit/minute"},
+        }
+        
+PV_PARAMS   = ('PV', )
+RAMP_PARAMS = ('ramp', )
+
+NICE_NAMES = ('General', 'PV List', 'Ramp')
 
 def get_config_name():
     """Get the command line --config option."""

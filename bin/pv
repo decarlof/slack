@@ -3,6 +3,7 @@ import sys
 import time
 import pathlib
 import argparse
+import numpy as np
 
 from epics import PV
 from datetime import datetime
@@ -64,6 +65,23 @@ def run_slack(args):
         log.warning('interrupted!')
         log.warning('Log information saved at: %s', args.lfname)
 
+def run_ramp(args):
+
+    temp_set  = PV(args.ramp_control_pv)
+    temp_read = PV(args.ramp_read_pv)
+
+    time_curr = time.time()
+
+    temp = np.arange(args.ramp_start,args.ramp_end,args.ramp_rate/60)
+
+    for t in temp:
+        log.info(f'set temp to {t:0.2f} deg {temp_read.get():0.2f}')
+        temp_set.put(t,wait=True)
+        while (np.abs(temp_read.get()-t)>1):
+            log.info(f'wait on {temp_read.get():0.2f} to reach {t:0.2f}')
+            time.sleep(1)
+        time.sleep(1)
+
 def main():
 
     # set logs directory
@@ -87,6 +105,7 @@ def main():
     set_params    = config.PV_PARAMS
     slack_params  = config.PV_PARAMS
     log_params    = config.PV_PARAMS
+    ramp_params   = config.RAMP_PARAMS
 
     cmd_parsers = [
         ('init',        init,           (),                             "Create configuration file"),
@@ -94,6 +113,7 @@ def main():
         ('set',         set_pv,         set_params,                     "Set PV to monitor as a comma-separated list"),
         ('log',         run_log,        log_params,                     "Send the list of PVs to a logger"),
         ('slack',       run_slack,      slack_params,                   "Send the list of PVs to a logger and to slack"),
+        ('ramp',        run_ramp,       ramp_params,                    "Ramp a PV from start to end at a set ramp rate"),
     ]
 
     subparsers = parser.add_subparsers(title="Commands", metavar='')
