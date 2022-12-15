@@ -39,11 +39,11 @@ def run_log(args):
     log.info('Logging the following PVs:')
 
     for x in range(len(args.pv_list)):
-        global_PVs[x] = PV(args.pv_list[x])
+        global_PVs[x] = PV(args.pv_list[x].strip())
     try:
         while True:
             for x in range(len(args.pv_list)):
-                log.info('PV name: %s; value:  %s' % (args.pv_list[x], global_PVs[x].get(as_string=True)))            
+                log.info('PV %d name:\t%s; value:\t%s' % (x, args.pv_list[x].strip(), global_PVs[x].get(as_string=True)))            
             time.sleep(args.pv_log_time)   
     except KeyboardInterrupt:
         log.warning('interrupted!')
@@ -67,6 +67,10 @@ def run_slack(args):
 
 def run_ramp(args):
 
+    # for now we are not updating the default values
+    # sections = config.RAMP_PARAMS
+    # config.write(args.config, args=args, sections=sections)
+
     temp_set  = PV(args.ramp_control_pv)
     temp_read = PV(args.ramp_read_pv)
 
@@ -75,7 +79,7 @@ def run_ramp(args):
     temp = np.arange(args.ramp_start,args.ramp_end,args.ramp_rate/60)
 
     for t in temp:
-        log.info(f'set temp to {t:0.2f} deg {temp_read.get():0.2f}')
+        log.info(f'set temp to {t:0.2f} deg; current reading: {temp_read.get():0.2f}')
         temp_set.put(t,wait=True)
         while (np.abs(temp_read.get()-t)>1):
             log.info(f'wait on {temp_read.get():0.2f} to reach {t:0.2f}')
